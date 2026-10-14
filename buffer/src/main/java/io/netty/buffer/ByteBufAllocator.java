@@ -16,8 +16,11 @@
 package io.netty.buffer;
 
 /**
- * Implementations are responsible to allocate buffers. Implementations of this interface are expected to be
- * thread-safe.
+ * 想让系统自己决定 → 用 buffer()
+ * 明确用于网络读写 → 用 ioBuffer()（推荐）
+ * 明确要堆内存 → 用 heapBuffer()
+ * 明确要直接内存 → 用 directBuffer()
+ * compositeBuffer() 生成 CompositeByteBuf
  */
 public interface ByteBufAllocator {
 

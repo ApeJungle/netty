@@ -22,8 +22,7 @@ import io.netty.util.internal.ObjectUtil;
 import io.netty.util.internal.UnstableApi;
 
 /**
- * Wraps another {@link ByteBufAllocator} and use heapbuffers everywhere except when a direct buffer is explicit
- * requested.
+ * 与 {@link PreferredDirectByteBufAllocator} 类似，更倾向于 Heap Buffer，堆内存，由 JVM 管理。
  */
 @UnstableApi
 public final class PreferHeapByteBufAllocator implements ByteBufAllocator {

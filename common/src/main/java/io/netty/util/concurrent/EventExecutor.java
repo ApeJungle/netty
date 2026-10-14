@@ -19,10 +19,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 /**
- * The {@link EventExecutor} is a special {@link EventExecutorGroup} which comes
- * with some handy methods to see if a {@link Thread} is executed in a event loop.
- * Besides this, it also extends the {@link EventExecutorGroup} to allow for a generic
- * way to access methods.
+ * {@link EventExecutor} 是一个特殊的 {@link EventExecutorGroup}，它提供了一些便捷的方法，用于检查 Thread 是否在事件循环中执行。
  */
 public interface EventExecutor extends EventExecutorGroup, ThreadAwareExecutor {
 

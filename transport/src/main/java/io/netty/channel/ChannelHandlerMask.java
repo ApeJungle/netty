@@ -32,6 +32,10 @@ import java.security.PrivilegedExceptionAction;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+/**
+ * 在将 ChannelHandler 添加到 ChannelPipeline 的那一刻，预先计算并标记出该 Handler 到底实现了哪些事件回调方法（如 channelRead、
+ * write、exceptionCaught 等），从而在运行时传播事件时直接跳过不关心的节点。
+ */
 final class ChannelHandlerMask {
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(ChannelHandlerMask.class);
 
@@ -71,7 +75,7 @@ final class ChannelHandlerMask {
             };
 
     /**
-     * Return the {@code executionMask}.
+     * 核心方法，计算 {@code executionMask}.
      */
     static int mask(Class<? extends ChannelHandler> clazz) {
         // Try to obtain the mask from the cache first. If this fails calculate it and put it in the cache for fast

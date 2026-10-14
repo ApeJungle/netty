@@ -30,6 +30,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public abstract class ConstantPool<T extends Constant<T>> {
 
+    /**
+     * key - Constant name
+     * value - Constant 对象
+     */
     private final ConcurrentMap<String, T> constants = new ConcurrentHashMap<>();
 
     private final AtomicInteger nextId = new AtomicInteger(1);
@@ -45,10 +49,7 @@ public abstract class ConstantPool<T extends Constant<T>> {
     }
 
     /**
-     * Returns the {@link Constant} which is assigned to the specified {@code name}.
-     * If there's no such {@link Constant}, a new one will be created and returned.
-     * Once created, the subsequent calls with the same {@code name} will always return the previously created one
-     * (i.e. singleton.)
+     * 注意：该方法不仅可以获取 Constant，如果 Constant 不存在还能创建。
      *
      * @param name the name of the {@link Constant}
      */

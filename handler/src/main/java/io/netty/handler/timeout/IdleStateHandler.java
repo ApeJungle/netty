@@ -97,12 +97,13 @@ import java.util.concurrent.TimeUnit;
  * @see WriteTimeoutHandler
  */
 public class IdleStateHandler extends ChannelDuplexHandler {
+    // 最小空闲时间，不能小于 1 ms 。0 表示禁用空闲判断
     private static final long MIN_TIMEOUT_NANOS = TimeUnit.MILLISECONDS.toNanos(1);
 
     private final boolean observeOutput;
-    private final long readerIdleTimeNanos;
-    private final long writerIdleTimeNanos;
-    private final long allIdleTimeNanos;
+    private final long readerIdleTimeNanos; // 读空闲时间
+    private final long writerIdleTimeNanos; // 写空闲时间
+    private final long allIdleTimeNanos; // 读写空闲时间
 
     private Ticker ticker = Ticker.systemTicker();
 

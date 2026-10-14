@@ -62,7 +62,7 @@ public interface ChannelPromise extends ChannelFuture, Promise<Void> {
     ChannelPromise awaitUninterruptibly();
 
     /**
-     * Returns a new {@link ChannelPromise} if {@link #isVoid()} returns {@code true} otherwise itself.
+     * 如果当前 Promise 是 void 类型，则返回一个非 void 的 Promise，以便支持结果监听。
      */
     ChannelPromise unvoid();
 }

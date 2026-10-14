@@ -19,7 +19,10 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.CompositeByteBuf;
 import io.netty.util.internal.UnstableApi;
-
+/**
+ * 非显式调用 heap方法外，其它方法强制使用 Direct Buffer，堆外内存，由操作系统管理。
+ * 与 {@link io.netty.channel.PreferHeapByteBufAllocator} 类似，当更倾向于 Direct Buffer
+ */
 @UnstableApi
 public final class PreferredDirectByteBufAllocator implements ByteBufAllocator {
     private ByteBufAllocator allocator;

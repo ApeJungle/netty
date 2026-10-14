@@ -33,8 +33,10 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadFactory;
 
 /**
- * {@link EventLoopGroup} which uses epoll under the covers. Because of this
- * it only works on linux.
+ *  不再推荐使用！推荐使用 IoHandler 新模型，推荐做法：<br/>
+ *  <code>
+ *       EventLoopGroup bossGroup = new MultiThreadIoEventLoopGroup(EpollIoHandler.newFactory());
+ *  </code>
  *
  * @deprecated Use {@link MultiThreadIoEventLoopGroup} with {@link EpollIoHandler#newFactory()}.
  */

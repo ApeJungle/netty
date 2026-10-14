@@ -19,12 +19,11 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadFactory;
 
 /**
- * Default implementation of {@link MultithreadEventExecutorGroup} which will use {@link DefaultEventExecutor} instances
- * to handle the tasks.
+ * {@link MultithreadEventExecutorGroup} 的默认实现，使用 {@link DefaultEventExecutor} 实例处理任务。
  */
 public class DefaultEventExecutorGroup extends MultithreadEventExecutorGroup {
     /**
-     * @see #DefaultEventExecutorGroup(int, ThreadFactory)
+     * @param nThreads 表示 EventExecutor[] 数组的大小，也对应着 nThreads 个固定线程。
      */
     public DefaultEventExecutorGroup(int nThreads) {
         this(nThreads, null);

@@ -21,215 +21,106 @@ import io.netty.util.concurrent.FutureListener;
 import java.net.ConnectException;
 import java.net.SocketAddress;
 
+/**
+ * 用于触发和传播出站操作（发出数据）
+ * 出站主动发起操作，控制权在用户手中，所以是以操作执行的方式。
+ */
 public interface ChannelOutboundInvoker {
 
     /**
-     * Request to bind to the given {@link SocketAddress} and notify the {@link ChannelFuture} once the operation
-     * completes, either because the operation was successful or because of an error.
-     * <p>
-     * This will result in having the
-     * {@link ChannelOutboundHandler#bind(ChannelHandlerContext, SocketAddress, ChannelPromise)} method
-     * called of the next {@link ChannelOutboundHandler} contained in the {@link ChannelPipeline} of the
-     * {@link Channel}.
+     * 绑定 Socket 地址并监听
      */
     default ChannelFuture bind(SocketAddress localAddress) {
         return bind(localAddress, newPromise());
     }
 
     /**
-     * Request to connect to the given {@link SocketAddress} and notify the {@link ChannelFuture} once the operation
-     * completes, either because the operation was successful or because of an error.
-     * <p>
-     * If the connection fails because of a connection timeout, the {@link ChannelFuture} will get failed with
-     * a {@link ConnectTimeoutException}. If it fails because of connection refused a {@link ConnectException}
-     * will be used.
-     * <p>
-     * This will result in having the
-     * {@link ChannelOutboundHandler#connect(ChannelHandlerContext, SocketAddress, SocketAddress, ChannelPromise)}
-     * method called of the next {@link ChannelOutboundHandler} contained in the {@link ChannelPipeline} of the
-     * {@link Channel}.
+     * 建立连接
      */
     default ChannelFuture connect(SocketAddress remoteAddress) {
         return connect(remoteAddress, newPromise());
     }
 
     /**
-     * Request to connect to the given {@link SocketAddress} while bind to the localAddress and notify the
-     * {@link ChannelFuture} once the operation completes, either because the operation was successful or because of
-     * an error.
-     * <p>
-     * This will result in having the
-     * {@link ChannelOutboundHandler#connect(ChannelHandlerContext, SocketAddress, SocketAddress, ChannelPromise)}
-     * method called of the next {@link ChannelOutboundHandler} contained in the {@link ChannelPipeline} of the
-     * {@link Channel}.
+     * 建立连接
      */
     default ChannelFuture connect(SocketAddress remoteAddress, SocketAddress localAddress) {
         return connect(remoteAddress, localAddress, newPromise());
     }
 
     /**
-     * Request to disconnect from the remote peer and notify the {@link ChannelFuture} once the operation completes,
-     * either because the operation was successful or because of an error.
-     * <p>
-     * This will result in having the
-     * {@link ChannelOutboundHandler#disconnect(ChannelHandlerContext, ChannelPromise)}
-     * method called of the next {@link ChannelOutboundHandler} contained in the {@link ChannelPipeline} of the
-     * {@link Channel}.
+     * 断开连接
      */
     default ChannelFuture disconnect() {
         return disconnect(newPromise());
     }
 
     /**
-     * Request to close the {@link Channel} and notify the {@link ChannelFuture} once the operation completes,
-     * either because the operation was successful or because of
-     * an error.
-     *
-     * After it is closed it is not possible to reuse it again.
-     * <p>
-     * This will result in having the
-     * {@link ChannelOutboundHandler#close(ChannelHandlerContext, ChannelPromise)}
-     * method called of the next {@link ChannelOutboundHandler} contained in the {@link ChannelPipeline} of the
-     * {@link Channel}.
+     * 关闭 Channel
      */
     default ChannelFuture close() {
         return close(newPromise());
     }
 
     /**
-     * Request to deregister from the previous assigned {@link EventExecutor} and notify the
-     * {@link ChannelFuture} once the operation completes, either because the operation was successful or because of
-     * an error.
-     * <p>
-     * This will result in having the
-     * {@link ChannelOutboundHandler#deregister(ChannelHandlerContext, ChannelPromise)}
-     * method called of the next {@link ChannelOutboundHandler} contained in the {@link ChannelPipeline} of the
-     * {@link Channel}.
-     *
+     * 将 Channel 从其当前绑定的 EventLoop上解绑。
      */
     default ChannelFuture deregister() {
         return deregister(newPromise());
     }
 
     /**
-     * Request to bind to the given {@link SocketAddress} and notify the {@link ChannelFuture} once the operation
-     * completes, either because the operation was successful or because of an error.
-     *
-     * The given {@link ChannelPromise} will be notified.
-     * <p>
-     * This will result in having the
-     * {@link ChannelOutboundHandler#bind(ChannelHandlerContext, SocketAddress, ChannelPromise)} method
-     * called of the next {@link ChannelOutboundHandler} contained in the {@link ChannelPipeline} of the
-     * {@link Channel}.
+     * 绑定 Socket 地址并监听
      */
     ChannelFuture bind(SocketAddress localAddress, ChannelPromise promise);
 
     /**
-     * Request to connect to the given {@link SocketAddress} and notify the {@link ChannelFuture} once the operation
-     * completes, either because the operation was successful or because of an error.
-     *
-     * The given {@link ChannelFuture} will be notified.
-     *
-     * <p>
-     * If the connection fails because of a connection timeout, the {@link ChannelFuture} will get failed with
-     * a {@link ConnectTimeoutException}. If it fails because of connection refused a {@link ConnectException}
-     * will be used.
-     * <p>
-     * This will result in having the
-     * {@link ChannelOutboundHandler#connect(ChannelHandlerContext, SocketAddress, SocketAddress, ChannelPromise)}
-     * method called of the next {@link ChannelOutboundHandler} contained in the {@link ChannelPipeline} of the
-     * {@link Channel}.
+     * 建立连接
      */
     ChannelFuture connect(SocketAddress remoteAddress, ChannelPromise promise);
 
     /**
-     * Request to connect to the given {@link SocketAddress} while bind to the localAddress and notify the
-     * {@link ChannelFuture} once the operation completes, either because the operation was successful or because of
-     * an error.
-     *
-     * The given {@link ChannelPromise} will be notified and also returned.
-     * <p>
-     * This will result in having the
-     * {@link ChannelOutboundHandler#connect(ChannelHandlerContext, SocketAddress, SocketAddress, ChannelPromise)}
-     * method called of the next {@link ChannelOutboundHandler} contained in the {@link ChannelPipeline} of the
-     * {@link Channel}.
+     * 建立连接
      */
     ChannelFuture connect(SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise);
 
     /**
-     * Request to disconnect from the remote peer and notify the {@link ChannelFuture} once the operation completes,
-     * either because the operation was successful or because of an error.
-     *
-     * The given {@link ChannelPromise} will be notified.
-     * <p>
-     * This will result in having the
-     * {@link ChannelOutboundHandler#disconnect(ChannelHandlerContext, ChannelPromise)}
-     * method called of the next {@link ChannelOutboundHandler} contained in the {@link ChannelPipeline} of the
-     * {@link Channel}.
+     * 断开连接
      */
     ChannelFuture disconnect(ChannelPromise promise);
 
     /**
-     * Request to close the {@link Channel} and notify the {@link ChannelFuture} once the operation completes,
-     * either because the operation was successful or because of
-     * an error.
-     *
-     * After it is closed it is not possible to reuse it again.
-     * The given {@link ChannelPromise} will be notified.
-     * <p>
-     * This will result in having the
-     * {@link ChannelOutboundHandler#close(ChannelHandlerContext, ChannelPromise)}
-     * method called of the next {@link ChannelOutboundHandler} contained in the {@link ChannelPipeline} of the
-     * {@link Channel}.
+     * 关闭 Channel
      */
     ChannelFuture close(ChannelPromise promise);
 
     /**
-     * Request to deregister from the previous assigned {@link EventExecutor} and notify the
-     * {@link ChannelFuture} once the operation completes, either because the operation was successful or because of
-     * an error.
-     *
-     * The given {@link ChannelPromise} will be notified.
-     * <p>
-     * This will result in having the
-     * {@link ChannelOutboundHandler#deregister(ChannelHandlerContext, ChannelPromise)}
-     * method called of the next {@link ChannelOutboundHandler} contained in the {@link ChannelPipeline} of the
-     * {@link Channel}.
+     * 将 Channel 从其当前绑定的 EventLoop上解绑。
      */
     ChannelFuture deregister(ChannelPromise promise);
 
     /**
-     * Request to Read data from the {@link Channel} into the first inbound buffer, triggers an
-     * {@link ChannelInboundHandler#channelRead(ChannelHandlerContext, Object)} event if data was
-     * read, and triggers a
-     * {@link ChannelInboundHandler#channelReadComplete(ChannelHandlerContext) channelReadComplete} event so the
-     * handler can decide to continue reading.  If there's a pending read operation already, this method does nothing.
-     * <p>
-     * This will result in having the
-     * {@link ChannelOutboundHandler#read(ChannelHandlerContext)}
-     * method called of the next {@link ChannelOutboundHandler} contained in the {@link ChannelPipeline} of the
-     * {@link Channel}.
+     * Netty 默认开启了 AUTO_READ（自动读取）。如果将 AUTO_READ 关闭，Netty 将不会主动从底层 Socket 接收数据；此时必须显式调用 read()，
+     * 底层才会触发下一次 Socket 读操作并向 Pipeline 触发 channelRead 事件（用于流量控制/背压）。
      */
     ChannelOutboundInvoker read();
 
     /**
-     * Request to write a message via this {@link ChannelHandlerContext} through the {@link ChannelPipeline}.
-     * This method will not request to actual flush, so be sure to call {@link #flush()}
-     * once you want to request to flush all pending data to the actual transport.
+     * 将要发送的数据对象 msg 写入到 Netty 的内部出站缓冲区（ChannelOutboundBuffer）中。
+     * write 不会触发底层的实际网络发送！ 数据只是进入了内存缓冲区，直到调用 flush() 时才会刷入 Socket 发送出去。
      */
     default ChannelFuture write(Object msg) {
         return write(msg, newPromise());
     }
 
     /**
-     * Request to write a message via this {@link ChannelHandlerContext} through the {@link ChannelPipeline}.
-     * This method will not request to actual flush, so be sure to call {@link #flush()}
-     * once you want to request to flush all pending data to the actual transport.
+     * 将要发送的数据对象 msg 写入到 Netty 的内部出站缓冲区（ChannelOutboundBuffer）中。
+     * write 不会触发底层的实际网络发送！ 数据只是进入了内存缓冲区，直到调用 flush() 时才会刷入 Socket 发送出去。
      */
     ChannelFuture write(Object msg, ChannelPromise promise);
 
     /**
-     * Request to flush all pending messages via this ChannelOutboundInvoker.
+     * 将之前通过 write 刷入出站缓冲区（ChannelOutboundBuffer）中的所有挂起数据，一次性刷新并写入底层 Socket 传输通道。
      */
     ChannelOutboundInvoker flush();
 

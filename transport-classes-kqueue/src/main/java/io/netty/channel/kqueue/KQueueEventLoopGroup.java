@@ -39,6 +39,11 @@ import java.util.concurrent.ThreadFactory;
 
 
 /**
+ *  不再推荐使用！推荐使用 IoHandler 新模型，推荐做法：<br/>
+ *  <code>
+ *       EventLoopGroup bossGroup = new MultiThreadIoEventLoopGroup(KQueueIoHandler.newFactory());
+ *  </code>
+ *
  * @deprecated Use {@link MultiThreadIoEventLoopGroup} with {@link KQueueIoHandler#newFactory()}.
  */
 @Deprecated

@@ -46,14 +46,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * {@link AbstractBootstrap} is a helper class that makes it easy to bootstrap a {@link Channel}. It support
- * method-chaining to provide an easy way to configure the {@link AbstractBootstrap}.
- *
- * <p>When not used in a {@link ServerBootstrap} context, the {@link #bind()} methods are useful for connectionless
- * transports such as datagram (UDP).</p>
+ * {@link AbstractBootstrap} 可以方便的启动一个 {@link Channel}
  */
 public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C extends Channel> implements Cloneable {
 
+    // 当 Set ChannelOption 异常时，只记录日志还是抛出异常关闭 Channel
     private static final boolean CLOSE_ON_SET_OPTION_FAILURE = SystemPropertyUtil.getBoolean(
             "io.netty.bootstrap.closeOnSetOptionFailure", true);
     @SuppressWarnings("unchecked")
@@ -321,6 +318,10 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
         }
     }
 
+    /**
+     * 创建并注册 {@link Channel}
+     * @return
+     */
     final ChannelFuture initAndRegister() {
         Channel channel = null;
         try {
@@ -337,12 +338,13 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
             return new DefaultChannelPromise(new FailedChannel(), GlobalEventExecutor.INSTANCE).setFailure(t);
         }
 
+        // 向 EventLoopGroup 中注册 Channel
         final ChannelFuture regFuture = config().group().register(channel);
-        if (regFuture.cause() != null) {
-            if (channel.isRegistered()) {
+        if (regFuture.cause() != null) { // 如果注册发生异常
+            if (channel.isRegistered()) { // channel 如果注册状态已经修改，但是后续逻辑发生异常，这样需要触发 Channel 的关闭事件
                 channel.close();
             } else {
-                channel.unsafe().closeForcibly();
+                channel.unsafe().closeForcibly(); // 不会触发关闭事件
             }
         }
 

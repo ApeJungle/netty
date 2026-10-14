@@ -22,8 +22,7 @@ package io.netty.util;
  */
 public interface AttributeMap {
     /**
-     * Get the {@link Attribute} for the given {@link AttributeKey}. This method will never return null, but may return
-     * an {@link Attribute} which does not have a value set yet.
+     * 注意：这个方法不会返回 null，如果不存在则会创建一个没有设置值的 {@link Attribute}
      */
     <T> Attribute<T> attr(AttributeKey<T> key);
 

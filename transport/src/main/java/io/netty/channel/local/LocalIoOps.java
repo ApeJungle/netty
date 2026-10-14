@@ -19,6 +19,7 @@ import io.netty.channel.IoOps;
 
 /**
  * {@link IoOps} implementation that can be used with {@link LocalIoHandler}.
+ *
  */
 public final class LocalIoOps implements IoOps {
 

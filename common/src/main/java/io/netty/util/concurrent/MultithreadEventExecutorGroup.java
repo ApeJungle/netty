@@ -31,8 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static io.netty.util.internal.ObjectUtil.checkPositive;
 
 /**
- * Abstract base class for {@link EventExecutorGroup} implementations that handles their tasks with multiple threads at
- * the same time.
+ * 使用多线程同时处理任务的 {@link EventExecutorGroup} 实现
  */
 public abstract class MultithreadEventExecutorGroup extends AbstractEventExecutorGroup {
 
@@ -43,40 +42,36 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
     private final EventExecutorChooserFactory.EventExecutorChooser chooser;
 
     /**
-     * Create a new instance.
-     *
-     * @param nThreads          the number of threads that will be used by this instance.
-     * @param threadFactory     the ThreadFactory to use, or {@code null} if the default should be used.
-     * @param args              arguments which will passed to each {@link #newChild(Executor, Object...)} call
+     * @param nThreads          线程数，也是 EventExecutor[] 数组大小
+     * @param threadFactory     {@link ThreadFactory}，默认使用 {@link DefaultThreadFactory}
+     * @param args              传递给 {@link #newChild(Executor, Object...)} 方法的参数
      */
     protected MultithreadEventExecutorGroup(int nThreads, ThreadFactory threadFactory, Object... args) {
         this(nThreads, threadFactory == null ? null : new ThreadPerTaskExecutor(threadFactory), args);
     }
 
     /**
-     * Create a new instance.
-     *
-     * @param nThreads          the number of threads that will be used by this instance.
-     * @param executor          the Executor to use, or {@code null} if the default should be used.
-     * @param args              arguments which will passed to each {@link #newChild(Executor, Object...)} call
+     * @param nThreads          线程数，也是 EventExecutor[] 数组大小
+     * @param executor          {@link Executor}，默认使用 {@link ThreadPerTaskExecutor}
+     * @param args              传递给 {@link #newChild(Executor, Object...)} 方法的参数
      */
     protected MultithreadEventExecutorGroup(int nThreads, Executor executor, Object... args) {
         this(nThreads, executor, DefaultEventExecutorChooserFactory.INSTANCE, args);
     }
 
     /**
-     * Create a new instance.
-     *
-     * @param nThreads          the number of threads that will be used by this instance.
-     * @param executor          the Executor to use, or {@code null} if the default should be used.
-     * @param chooserFactory    the {@link EventExecutorChooserFactory} to use.
-     * @param args              arguments which will passed to each {@link #newChild(Executor, Object...)} call
+     * @param nThreads          线程数，也是 EventExecutor[] 数组大小
+     * @param executor          {@link Executor}，默认使用 {@link ThreadPerTaskExecutor}
+     * @param chooserFactory    {@link EventExecutorChooserFactory}
+     *                          用来创建 {@link EventExecutorChooserFactory.EventExecutorChooser}，选择 {@link EventExecutor}
+     * @param args              传递给 {@link #newChild(Executor, Object...)} 方法的参数
      */
     protected MultithreadEventExecutorGroup(int nThreads, Executor executor,
                                             EventExecutorChooserFactory chooserFactory, Object... args) {
         checkPositive(nThreads, "nThreads");
 
         if (executor == null) {
+            // ThreadPerTaskExecutor 单线程 Executor
             executor = new ThreadPerTaskExecutor(newDefaultThreadFactory());
         }
 
@@ -179,9 +174,7 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
     }
 
     /**
-     * Create a new EventExecutor which will later then accessible via the {@link #next()}  method. This method will be
-     * called for each thread that will serve this {@link MultithreadEventExecutorGroup}.
-     *
+     * 创建 {@link EventExecutor} 对象实例。后续通过 {@link #next()} 方法访问。
      */
     protected abstract EventExecutor newChild(Executor executor, Object... args) throws Exception;
 

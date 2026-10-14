@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Default implementation which uses simple round-robin to choose next {@link EventExecutor}.
+ * 默认使用轮询获取下一个 {@link EventExecutor}.
  */
 public final class DefaultEventExecutorChooserFactory implements EventExecutorChooserFactory {
 
@@ -29,6 +29,8 @@ public final class DefaultEventExecutorChooserFactory implements EventExecutorCh
 
     @Override
     public EventExecutorChooser newChooser(EventExecutor[] executors) {
+        // 如果 executors 数组的长度是 2 的整数次幂，那么使用高性能的轮询策略
+        // 注意：PowerOfTwoEventExecutorChooser 和 GenericEventExecutorChooser 都是轮询策略，不同的地方在于运算性能。
         if (isPowerOfTwo(executors.length)) {
             return new PowerOfTwoEventExecutorChooser(executors);
         } else {
@@ -37,6 +39,7 @@ public final class DefaultEventExecutorChooserFactory implements EventExecutorCh
     }
 
     private static boolean isPowerOfTwo(int val) {
+        // 快速计算 val 是否是 2 的整数次幂
         return (val & -val) == val;
     }
 
@@ -50,6 +53,7 @@ public final class DefaultEventExecutorChooserFactory implements EventExecutorCh
 
         @Override
         public EventExecutor next() {
+            // 使用位运算优化的轮询策略
             return executors[idx.getAndIncrement() & executors.length - 1];
         }
     }
@@ -67,6 +71,7 @@ public final class DefaultEventExecutorChooserFactory implements EventExecutorCh
 
         @Override
         public EventExecutor next() {
+            // 使用取模运算轮询选择下一个 EventExecutor
             return executors[(int) Math.abs(idx.getAndIncrement() % executors.length)];
         }
     }

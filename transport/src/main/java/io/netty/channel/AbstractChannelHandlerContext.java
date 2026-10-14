@@ -57,6 +57,18 @@ import static io.netty.channel.ChannelHandlerMask.MASK_USER_EVENT_TRIGGERED;
 import static io.netty.channel.ChannelHandlerMask.MASK_WRITE;
 import static io.netty.channel.ChannelHandlerMask.mask;
 
+/**
+ *
+ * <pre>
+ * --------   --------   --------
+ * | next |-->| next |-->| next |
+ * --------   --------   --------
+ * | ctx1 |   | ctx2 |   | ctx3 |
+ * --------   --------   --------
+ * | prev |<--| prev |<--| prev |
+ * --------   --------   --------
+ * </pre>
+ */
 abstract class AbstractChannelHandlerContext implements ChannelHandlerContext, ResourceLeakHint {
 
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(AbstractChannelHandlerContext.class);
@@ -146,6 +158,7 @@ abstract class AbstractChannelHandlerContext implements ChannelHandlerContext, R
 
     @Override
     public ChannelHandlerContext fireChannelRegistered() {
+        // 在双向链表中寻找下一个关心 ChannelRegistered 事件的节点
         AbstractChannelHandlerContext next = findContextInbound(MASK_CHANNEL_REGISTERED);
         if (next.executor().inEventLoop()) {
             if (next.invokeHandler()) {

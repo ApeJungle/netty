@@ -295,15 +295,11 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
 
     /**
      * Take the next {@link Runnable} from the task queue and so will block if no task is currently present.
-     * <p>
-     * Be aware that this method will throw an {@link UnsupportedOperationException} if the task queue, which was
-     * created via {@link #newTaskQueue()}, does not implement {@link BlockingQueue}.
-     * </p>
-     *
      * @return {@code null} if the executor thread has been interrupted or waken up.
      */
     protected Runnable takeTask() {
         assert inEventLoop();
+        // taskQueue 必须是 BlockingQueue
         if (!(taskQueue instanceof BlockingQueue)) {
             throw new UnsupportedOperationException();
         }

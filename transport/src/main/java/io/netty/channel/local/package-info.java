@@ -15,7 +15,6 @@
  */
 
 /**
- * A virtual transport that enables the communication between the two
- * parties in the same virtual machine.
+ * 一种虚拟传输机制，可实现同一台虚拟机内双方之间的通信。
  */
 package io.netty.channel.local;

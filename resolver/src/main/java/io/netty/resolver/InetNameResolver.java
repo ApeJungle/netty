@@ -51,4 +51,5 @@ public abstract class InetNameResolver extends SimpleNameResolver<InetAddress> {
         }
         return result;
     }
+
 }

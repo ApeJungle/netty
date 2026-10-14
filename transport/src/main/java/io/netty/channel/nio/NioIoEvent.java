@@ -18,14 +18,14 @@ package io.netty.channel.nio;
 import io.netty.channel.IoEvent;
 
 /**
- * {@link IoEvent} that must be handled by the {@link NioIoHandle}.
+ * {@link IoEvent} 必须被 {@link NioIoHandle} 处理.
  */
 public interface NioIoEvent extends IoEvent {
 
     /**
-     * Returns the {@link NioIoOps} which did trigger the {@link NioIoEvent}.
+     * {@link NioIoOps} 会生成或触发 {@link NioIoEvent}
      *
-     * @return  ops.
+     * @return  ops 谁触发的事件
      */
     NioIoOps ops();
 }

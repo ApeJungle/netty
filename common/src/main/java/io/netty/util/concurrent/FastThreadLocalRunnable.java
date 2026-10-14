@@ -17,6 +17,11 @@ package io.netty.util.concurrent;
 
 import io.netty.util.internal.ObjectUtil;
 
+/**
+ * 专为 {@link FastThreadLocal} 使用设计的 {@link Runnable}
+ * 1. 将普通的 {@link Runnable} 包装成 {@link FastThreadLocalRunnable}
+ * 2. 在任务执行完毕后自动清除当前线程中的所有 {@link FastThreadLocal} 变量，解决了线程池场景下 ThreadLocal 容易内存泄漏的问题
+ */
 final class FastThreadLocalRunnable implements Runnable {
     private final Runnable runnable;
 
@@ -29,6 +34,7 @@ final class FastThreadLocalRunnable implements Runnable {
         try {
             runnable.run();
         } finally {
+            // 自动清除当前线程中的所有 FastThreadLocal 变量
             FastThreadLocal.removeAll();
         }
     }

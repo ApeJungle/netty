@@ -41,10 +41,11 @@ import java.util.List;
  */
 public class LineBasedFrameDecoder extends ByteToMessageDecoder {
 
-    /** Maximum length of a frame we're willing to decode.  */
+    /** 可解码的帧的最大长度，超过此长度可能抛出异常，也可能忽略帧  */
     private final int maxLength;
-    /** Whether or not to throw an exception as soon as we exceed maxLength. */
+    /** 超过最大长度时是否快速失败，抛出异常 */
     private final boolean failFast;
+    /** 解码后是否去除分隔符 */
     private final boolean stripDelimiter;
 
     /** True if we're discarding input because we're already over maxLength.  */
@@ -106,17 +107,24 @@ public class LineBasedFrameDecoder extends ByteToMessageDecoder {
         if (!discarding) {
             if (eol >= 0) {
                 final ByteBuf frame;
+                // 消息长度，不包括分隔符
                 final int length = eol - buffer.readerIndex();
+                // 分隔符长度
                 final int delimLength = buffer.getByte(eol) == '\r'? 2 : 1;
 
+                // 消息过长时，推进 readerIndex 并抛出异常
+                // 这里为什么不用 failFast 标记判断是否需要跑出异常？
                 if (length > maxLength) {
                     buffer.readerIndex(eol + delimLength);
                     fail(ctx, length);
                     return null;
                 }
 
+                // 是否去除分隔符
                 if (stripDelimiter) {
+                    // 读取消息帧
                     frame = buffer.readRetainedSlice(length);
+                    // 跳过分隔符
                     buffer.skipBytes(delimLength);
                 } else {
                     frame = buffer.readRetainedSlice(length + delimLength);
@@ -126,8 +134,8 @@ public class LineBasedFrameDecoder extends ByteToMessageDecoder {
             } else {
                 final int length = buffer.readableBytes();
                 if (length > maxLength) {
-                    discardedBytes = length;
-                    buffer.readerIndex(buffer.writerIndex());
+                    discardedBytes = length; // 需要忽略的字节长度
+                    buffer.readerIndex(buffer.writerIndex()); // 推进 readerIndex 到消息末端
                     discarding = true;
                     offset = 0;
                     if (failFast) {
@@ -140,7 +148,7 @@ public class LineBasedFrameDecoder extends ByteToMessageDecoder {
             if (eol >= 0) {
                 final int length = discardedBytes + eol - buffer.readerIndex();
                 final int delimLength = buffer.getByte(eol) == '\r'? 2 : 1;
-                buffer.readerIndex(eol + delimLength);
+                buffer.readerIndex(eol + delimLength); // 找到标记后，将 readerIndex 推进到超长消息的结尾
                 discardedBytes = 0;
                 discarding = false;
                 if (!failFast) {
@@ -148,7 +156,7 @@ public class LineBasedFrameDecoder extends ByteToMessageDecoder {
                 }
             } else {
                 discardedBytes += buffer.readableBytes();
-                buffer.readerIndex(buffer.writerIndex());
+                buffer.readerIndex(buffer.writerIndex()); // 没有找到标记，则继续忽略
                 // We skip everything in the buffer, we need to set the offset to 0 again.
                 offset = 0;
             }
@@ -174,6 +182,13 @@ public class LineBasedFrameDecoder extends ByteToMessageDecoder {
         int totalLength = buffer.readableBytes();
         int i = buffer.indexOf(buffer.readerIndex() + offset,
                                buffer.readerIndex() + totalLength, (byte) '\n');
+        /**
+         * offset，首次搜索标记时为 0
+         * 当第一次搜索时，如果没找到，则置为当前消息长度
+         * 当第二次搜索时，如果找到了，则将 offset 重置为 0
+         * 这样避免多次搜索总是从 readerIndex 开始重复搜索。但是注意 offset 与 readerIndex 是有强关联的，如果 readerIndex 发生变化，
+         * 那么 offset 需要一起变化！
+         */
         if (i >= 0) {
             offset = 0;
             if (i > 0 && buffer.getByte(i - 1) == '\r') {

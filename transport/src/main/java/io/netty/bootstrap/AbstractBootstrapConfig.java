@@ -38,14 +38,14 @@ public abstract class AbstractBootstrapConfig<B extends AbstractBootstrap<B, C>,
     }
 
     /**
-     * Returns the configured local address or {@code null} if non is configured yet.
+     * 本地监听地址，服务端和客户端都有本地地址
      */
     public final SocketAddress localAddress() {
         return bootstrap.localAddress();
     }
 
     /**
-     * Returns the configured {@link ChannelFactory} or {@code null} if non is configured yet.
+     * 创建 Channel 对象的工厂类
      */
     @SuppressWarnings("deprecation")
     public final ChannelFactory<? extends C> channelFactory() {

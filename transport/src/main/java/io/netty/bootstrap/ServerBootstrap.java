@@ -66,7 +66,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
     }
 
     /**
-     * Specify the {@link EventLoopGroup} which is used for the parent (acceptor) and the child (client).
+     * parentGroup 和 childGroup 公用同一个 EventLoopGroup
      */
     @Override
     public ServerBootstrap group(EventLoopGroup group) {
@@ -74,12 +74,10 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
     }
 
     /**
-     * Set the {@link EventLoopGroup} for the parent (acceptor) and the child (client). These
-     * {@link EventLoopGroup}'s are used to handle all the events and IO for {@link ServerChannel} and
-     * {@link Channel}'s.
-     * <p>
-     * <strong>Important:</strong> Usually this is only useful for advanced use-cases and usually
-     * {@link #group(EventLoopGroup)} is the preferred way to configure the group.
+     * 重要：这个构造方法通常只用于高级优化场景，一般 {@link #group(EventLoopGroup)} 使用同一个 group 是更喜欢的方式。
+     *
+     * @param parentGroup bossGroup 只负责监听端口处理 accept 新连接，然后把连接注册到 childGroup 线程上。通常一个线程足以。
+     * @param childGroup workerGroup 专注于已有客户端连接的 I/O 事件处理和业务逻辑
      */
     public ServerBootstrap group(EventLoopGroup parentGroup, EventLoopGroup childGroup) {
         super.group(parentGroup);

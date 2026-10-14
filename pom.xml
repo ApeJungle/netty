@@ -846,6 +846,7 @@
     <module>jfr-stub</module>
     <module>varhandle-stub</module>
     <module>bom</module>
+      <module>codec-gm</module>
   </modules>
 
   <dependencyManagement>

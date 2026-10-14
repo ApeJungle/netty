@@ -59,22 +59,24 @@ public final class NioIoOps implements IoOps {
      */
     public static final NioIoOps READ_AND_WRITE = new NioIoOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
 
-    // Just use an array to store often used values.
+    // NioIoOps 对应的 NioIoEvent
+    // Netty 风格，用直接寻址替代查询映射。宁愿浪费 30-8=22 个槽位。
     private static final NioIoEvent[] EVENTS;
 
     static {
+        // 所有基本操作：0000 0000 | 0001 0000 | 0000 1000 | 0000 0100 | 0000 0001 = 0001 1101 = 29
         NioIoOps all = new NioIoOps(
                 NONE.value | ACCEPT.value | CONNECT.value | WRITE.value | READ.value);
 
-        EVENTS = new NioIoEvent[all.value + 1];
-        addToArray(EVENTS, NONE);
-        addToArray(EVENTS, ACCEPT);
-        addToArray(EVENTS, CONNECT);
-        addToArray(EVENTS, WRITE);
-        addToArray(EVENTS, READ);
-        addToArray(EVENTS, READ_AND_ACCEPT);
-        addToArray(EVENTS, READ_AND_WRITE);
-        addToArray(EVENTS, all);
+        EVENTS = new NioIoEvent[all.value + 1]; // 数组的长度是 29+1=30
+        addToArray(EVENTS, NONE); // EVENTS[0] -> NONE
+        addToArray(EVENTS, ACCEPT); // EVENTS[16] -> ACCEPT
+        addToArray(EVENTS, CONNECT); // EVENTS[8] -> CONNECT
+        addToArray(EVENTS, WRITE); // EVENTS[4] -> WRITE
+        addToArray(EVENTS, READ); // EVENTS[1] -> READ
+        addToArray(EVENTS, READ_AND_ACCEPT); // EVENTS[17] -> READ_AND_ACCEPT
+        addToArray(EVENTS, READ_AND_WRITE); // EVENTS[5] -> READ_AND_WRITE
+        addToArray(EVENTS, all); // EVENTS[29] -> all
     }
 
     private static void addToArray(NioIoEvent[] array, NioIoOps opt) {
@@ -88,16 +90,14 @@ public final class NioIoOps implements IoOps {
     }
 
     /**
-     * Returns {@code true} if this {@link NioIoOps} is a combination of the given {@link NioIoOps}.
-     * @param ops   the ops.
-     * @return      {@code true} if a combination of the given.
+     * 当前对象是否包含某个 {@link NioIoOps}
      */
     public boolean contains(NioIoOps ops) {
         return isIncludedIn(ops.value);
     }
 
     /**
-     * Return a {@link NioIoOps} which is a combination of the current and the given {@link NioIoOps}.
+     * 当前对象添加一个 {@link NioIoOps}
      *
      * @param ops   the {@link NioIoOps} that should be added to this one.
      * @return      a {@link NioIoOps}.
@@ -110,7 +110,7 @@ public final class NioIoOps implements IoOps {
     }
 
     /**
-     * Return a {@link NioIoOps} which is not a combination of the current and the given {@link NioIoOps}.
+     * 当前对象移除一个 {@link NioIoOps}
      *
      * @param ops   the {@link NioIoOps} that should be remove from this one.
      * @return      a {@link NioIoOps}.
@@ -188,6 +188,7 @@ public final class NioIoOps implements IoOps {
         return new DefaultNioIoEvent(new NioIoOps(value));
     }
 
+    // NioIoOps 对应的 NioIoEvent
     private static final class DefaultNioIoEvent implements NioIoEvent {
         private final NioIoOps ops;
 

@@ -26,20 +26,12 @@ import static io.netty.util.internal.InternalThreadLocalMap.UNSET;
 import static io.netty.util.internal.InternalThreadLocalMap.VARIABLES_TO_REMOVE_INDEX;
 
 /**
- * A special variant of {@link ThreadLocal} that yields higher access performance when accessed from a
- * {@link FastThreadLocalThread}.
- * <p>
- * Internally, a {@link FastThreadLocal} uses a constant index in an array, instead of using hash code and hash table,
- * to look for a variable.  Although seemingly very subtle, it yields slight performance advantage over using a hash
- * table, and it is useful when accessed frequently.
- * </p><p>
- * To take advantage of this thread-local variable, your thread must be a {@link FastThreadLocalThread} or its subtype.
- * By default, all threads created by {@link DefaultThreadFactory} are {@link FastThreadLocalThread} due to this reason.
- * </p><p>
- * Note that the fast path is only possible on threads that extend {@link FastThreadLocalThread}, because it requires
- * a special field to store the necessary state.  An access by any other kind of thread falls back to a regular
- * {@link ThreadLocal}.
- * </p>
+ * {@link ThreadLocal} 的一个特殊性能优化的变体.
+ * FastThreadLocal 在内部使用数组的常量索引（而非 hash code 和 hash table）来查找变量。虽然这一差异看似微乎其微，但与使用 hash table
+ * 相比能带来些许性能优势，且在频繁访问时尤为有用。
+ * 要利用这个 {@link ThreadLocal} 的优势，您的线程必须是 {@link FastThreadLocalThread} 或其子类型。出于这个原因，默认情况下，
+ * {@link DefaultThreadFactory} 创建的所有线程都是 {@link FastThreadLocalThread}。
+ * 如果使用任何其他类型的线程进行访问时，都会回退到普通的 {@link ThreadLocal}
  *
  * @param <V> the type of the thread-local variable
  * @see ThreadLocal
@@ -47,9 +39,7 @@ import static io.netty.util.internal.InternalThreadLocalMap.VARIABLES_TO_REMOVE_
 public class FastThreadLocal<V> {
 
     /**
-     * Removes all {@link FastThreadLocal} variables bound to the current thread.  This operation is useful when you
-     * are in a container environment, and you don't want to leave the thread local variables in the threads you do not
-     * manage.
+     * 清除所有当前线程的 FastThreadLocal 变量
      */
     public static void removeAll() {
         InternalThreadLocalMap threadLocalMap = InternalThreadLocalMap.getIfSet();

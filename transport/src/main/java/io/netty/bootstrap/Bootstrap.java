@@ -38,11 +38,7 @@ import java.net.SocketAddress;
 import java.util.Collection;
 
 /**
- * A {@link Bootstrap} that makes it easy to bootstrap a {@link Channel} to use
- * for clients.
- *
- * <p>The {@link #bind()} methods are useful in combination with connectionless transports such as datagram (UDP).
- * For regular TCP connections, please use the provided {@link #connect()} methods.</p>
+ * {@link Bootstrap} 启动一个客户端 Channel
  */
 public class Bootstrap extends AbstractBootstrap<Bootstrap, Channel> {
 
@@ -158,6 +154,7 @@ public class Bootstrap extends AbstractBootstrap<Bootstrap, Channel> {
     }
 
     /**
+     * 解析 socket 地址并连接
      * @see #connect()
      */
     private ChannelFuture doResolveAndConnect(final SocketAddress remoteAddress, final SocketAddress localAddress) {

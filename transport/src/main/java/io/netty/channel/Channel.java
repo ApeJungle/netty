@@ -100,17 +100,18 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
     ChannelConfig config();
 
     /**
-     * Returns {@code true} if the {@link Channel} is open and may get active later
+     * Channel 的关闭状态，并不直接表示网络连接是否已经建立，不一定是 active。
+     * open 不一定 active，但 active 一定 open
      */
     boolean isOpen();
 
     /**
-     * Returns {@code true} if the {@link Channel} is registered with an {@link EventLoop}.
+     * Channel 是否注册到 EventLoop
      */
     boolean isRegistered();
 
     /**
-     * Return {@code true} if the {@link Channel} is active and so connected.
+     * Channel 是否处于活跃状态，建立连接并处理 IO 事件
      */
     boolean isActive();
 
@@ -160,6 +161,9 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
      *
      * {@link WriteBufferWaterMark} can be used to configure on which condition
      * the write buffer would cause this channel to change writability.
+     *
+     * 当且仅当 I/O 线程将立即执行写操作时，才会返回 true。
+     * 当返回 false 时，写操作会排队直到 I/O 线程能够处理。
      */
     default boolean isWritable() {
         ChannelOutboundBuffer buf = unsafe().outboundBuffer();
@@ -171,6 +175,8 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
      * This quantity will always be non-negative. If {@link #isWritable()} is {@code false} then 0.
      *
      * {@link WriteBufferWaterMark} can be used to define writability settings.
+     *
+     * 在不可写之前还能写入多少字节
      */
     default long bytesBeforeUnwritable() {
         ChannelOutboundBuffer buf = unsafe().outboundBuffer();
@@ -184,6 +190,7 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
      * This quantity will always be non-negative. If {@link #isWritable()} is {@code true} then 0.
      *
      * {@link WriteBufferWaterMark} can be used to define writability settings.
+     * 在可写之前还有多少字节需要排空
      */
     default long bytesBeforeWritable() {
         ChannelOutboundBuffer buf = unsafe().outboundBuffer();
@@ -203,7 +210,7 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
     ChannelPipeline pipeline();
 
     /**
-     * Return the assigned {@link ByteBufAllocator} which will be used to allocate {@link ByteBuf}s.
+     * 返回分配给 Channel 的 {@link ByteBufAllocator}
      */
     default ByteBufAllocator alloc() {
         return config().getAllocator();
@@ -424,8 +431,7 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
         void close(ChannelPromise promise);
 
         /**
-         * Closes the {@link Channel} immediately without firing any events.  Probably only useful
-         * when registration attempt failed.
+         * 立即关闭 {@link Channel}，不会触发任何事件。一般在注册失败时使用。
          */
         void closeForcibly();
 

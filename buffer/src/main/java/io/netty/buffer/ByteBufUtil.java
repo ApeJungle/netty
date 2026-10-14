@@ -73,6 +73,7 @@ public final class ByteBufUtil {
             (int) CharsetUtil.encoder(CharsetUtil.UTF_8).maxBytesPerChar();
 
     static final int WRITE_CHUNK_SIZE = 8192;
+    // 默认 ByteBufAllocator
     static final ByteBufAllocator DEFAULT_ALLOCATOR;
     private static final boolean SWAR_UNALIGNED = PlatformDependent.canUnalignedAccess();
 

@@ -144,6 +144,11 @@ public abstract class AbstractEventExecutor extends AbstractExecutorService impl
         }
     }
 
+    /**
+     * 调用 {@link Runnable#run()} 方法
+     *
+     * @param task Runnable 任务
+     */
     protected static void runTask(@Execute Runnable task) {
         task.run();
     }

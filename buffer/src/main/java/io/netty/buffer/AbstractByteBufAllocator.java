@@ -25,7 +25,7 @@ import io.netty.util.internal.PlatformDependent;
 import io.netty.util.internal.StringUtil;
 
 /**
- * Skeletal {@link ByteBufAllocator} implementation to extend.
+ * {@link ByteBufAllocator} 可扩展的基础实现。
  */
 public abstract class AbstractByteBufAllocator implements ByteBufAllocator {
     static final int DEFAULT_INITIAL_CAPACITY = 256;
@@ -61,11 +61,12 @@ public abstract class AbstractByteBufAllocator implements ByteBufAllocator {
         return buf;
     }
 
+    // 是否默认使用 Direct Buffer
     private final boolean directByDefault;
     private final ByteBuf emptyBuf;
 
     /**
-     * Instance use heap buffers by default
+     * 默认使用堆内存
      */
     protected AbstractByteBufAllocator() {
         this(false);
@@ -106,6 +107,7 @@ public abstract class AbstractByteBufAllocator implements ByteBufAllocator {
         return heapBuffer(initialCapacity, maxCapacity);
     }
 
+    // IO Buffer 更倾向于 Direct Buffer
     @Override
     public ByteBuf ioBuffer() {
         if (PlatformDependent.canReliabilyFreeDirectBuffers() || isDirectBufferPooled()) {

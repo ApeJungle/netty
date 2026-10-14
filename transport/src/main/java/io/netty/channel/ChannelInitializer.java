@@ -15,39 +15,28 @@
  */
 package io.netty.channel;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * A special {@link ChannelInboundHandler} which offers an easy way to initialize a {@link Channel} once it was
- * registered to its {@link EventLoop}.
- *
- * Implementations are most often used in the context of {@link Bootstrap#handler(ChannelHandler)} ,
- * {@link ServerBootstrap#handler(ChannelHandler)} and {@link ServerBootstrap#childHandler(ChannelHandler)} to
- * setup the {@link ChannelPipeline} of a {@link Channel}.
- *
+ * 用于在 {@link Channel} 注册到 {@link EventLoop} 后，对其 ChannelPipeline 进行初始化配置。
+ * ChannelInitializer 本质上是一个“用完即丢”的装配工：
  * <pre>
- *
- * public class MyChannelInitializer extends {@link ChannelInitializer} {
- *     public void initChannel({@link Channel} channel) {
- *         channel.pipeline().addLast("myHandler", new MyHandler());
- *     }
- * }
- *
- * {@link ServerBootstrap} bootstrap = ...;
- * ...
- * bootstrap.childHandler(new MyChannelInitializer());
- * ...
+ * [新客户端连接建立]
+ *        │
+ *        ▼
+ * 1. 触发 ChannelRegistered 事件
+ *        │
+ *        ▼
+ * 2. 执行 ChannelInitializer.initChannel(ch)  --> 将你的自定义 Handlers 依次 addLast 到 Pipeline
+ *        │
+ *        ▼
+ * 3. ChannelInitializer 自动将自己从 Pipeline 中 remove 移除
  * </pre>
- * Be aware that this class is marked as {@link Sharable} and so the implementation must be safe to be re-used.
- *
  * @param <C>   A sub-type of {@link Channel}
  */
 @Sharable

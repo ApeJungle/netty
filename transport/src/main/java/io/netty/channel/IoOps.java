@@ -16,10 +16,8 @@
 package io.netty.channel;
 
 /**
- * An IO op that can be submitted to an {@link IoRegistration} via {@link IoRegistration#submit(IoOps)}.
-// * These submitted {@link IoOps} will result in {@link IoEvent}s on the related {@link IoHandle}.
- * Concrete {@link IoRegistration} implementations support different concrete {@link IoOps} implementations and
- * will so also "produce" concrete {@link IoEvent}s.
+ * IO op 可以通过 {@link IoRegistration#submit(IoOps)} 提交到 {@link IoRegistration}，提交后会产生与 {@link IoHandle} 关联的
+ * {@link IoEvent}s。
  */
 public interface IoOps {
     // Marker interface.

@@ -19,6 +19,9 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.CompositeByteBuf;
 
+/**
+ * ioBuffer 方法强制使用 Direct Buffer，堆外内存，由操作系统管理。
+ */
 final class DirectIoByteBufAllocator implements ByteBufAllocator {
 
     private final ByteBufAllocator wrapped;

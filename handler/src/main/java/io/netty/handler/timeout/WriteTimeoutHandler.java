@@ -106,6 +106,7 @@ public class WriteTimeoutHandler extends ChannelOutboundHandlerAdapter {
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
         if (timeoutNanos > 0) {
+            // 如果当前 Promise 是 void 类型，则返回一个非 void 的 Promise，以便支持结果监听。
             promise = promise.unvoid();
             scheduleTimeout(ctx, promise);
         }
@@ -140,6 +141,7 @@ public class WriteTimeoutHandler extends ChannelOutboundHandlerAdapter {
         }
     }
 
+    // 链表中新增 WriteTimeoutTask
     private void addWriteTimeoutTask(WriteTimeoutTask task) {
         assert task.ctx.executor().inEventLoop();
         if (lastTask != null) {
@@ -149,6 +151,10 @@ public class WriteTimeoutHandler extends ChannelOutboundHandlerAdapter {
         lastTask = task;
     }
 
+    /**
+     * 写操作完成或超时，最后都会删除链表中的指定 task
+     * @param task
+     */
     private void removeWriteTimeoutTask(WriteTimeoutTask task) {
         assert task.ctx.executor().inEventLoop();
         if (task == lastTask) {
@@ -173,7 +179,8 @@ public class WriteTimeoutHandler extends ChannelOutboundHandlerAdapter {
     }
 
     /**
-     * Is called when a write timeout was detected
+     * 注意：这里默认如果写操作超时了，会默认关闭 ctx => channel => 连接断开
+     * 这样太过暴力！
      */
     protected void writeTimedOut(ChannelHandlerContext ctx) throws Exception {
         if (!closed) {
@@ -188,7 +195,10 @@ public class WriteTimeoutHandler extends ChannelOutboundHandlerAdapter {
         private final ChannelHandlerContext ctx;
         private final ChannelPromise promise;
 
-        // WriteTimeoutTask is also a node of a doubly-linked list
+        // WriteTimeoutTask 是一个双向链表结构
+        // WriteTimeoutTask 在超时时间段内，可能会有多个写操作，所以就会产生多个 WriteTimeoutTask。
+        // Task1 ⇄ Task2 ⇄ Task3 ⇄ ... ⇄ Task1000
+        // 采用链表结构便于删除 WriteTimeoutTask
         WriteTimeoutTask prev;
         WriteTimeoutTask next;
 
@@ -204,14 +214,14 @@ public class WriteTimeoutHandler extends ChannelOutboundHandlerAdapter {
             // Was not written yet so issue a write timeout
             // The promise itself will be failed with a ClosedChannelException once the close() was issued
             // See https://github.com/netty/netty/issues/2159
-            if (!promise.isDone()) {
+            if (!promise.isDone()) { // 如果在指定 timeoutNanos 后写操作还没有完成
                 try {
-                    writeTimedOut(ctx);
+                    writeTimedOut(ctx); // 触发写超时操作，超时了如何处理？
                 } catch (Throwable t) {
                     ctx.fireExceptionCaught(t);
                 }
             }
-            removeWriteTimeoutTask(this);
+            removeWriteTimeoutTask(this); // 删除 WriteTimeoutTask
         }
 
         @Override
